@@ -127,6 +127,21 @@ map.fitBounds(boundsLine.getBounds(), {padding: [20, 20]});
     status.textContent = text;
   }
 
+  function environmentProblem() {
+    if (!window.isSecureContext) {
+      return `このページはHTTPSではありません。iPhone Safariの現在地取得はHTTPS配信が必要です。現在のURL: ${location.protocol}`;
+    }
+    if (!navigator.geolocation) {
+      return "このブラウザでは位置情報APIが使えません。Safariの位置情報設定を確認してください。";
+    }
+    return "";
+  }
+
+  const initialProblem = environmentProblem();
+  if (initialProblem) {
+    setStatus(initialProblem);
+  }
+
   function updatePosition(pos) {
     const lat = pos.coords.latitude;
     const lon = pos.coords.longitude;
@@ -167,8 +182,9 @@ map.fitBounds(boundsLine.getBounds(), {padding: [20, 20]});
   }
 
   button.addEventListener("click", function () {
-    if (!navigator.geolocation) {
-      setStatus("このブラウザは位置情報に対応していません。");
+    const problem = environmentProblem();
+    if (problem) {
+      setStatus(problem);
       return;
     }
 
